@@ -98,3 +98,47 @@ URN처럼 이름을 부여한다면 찾기가 힘들다. 각 URN에 리소스의
 
 <br />
 <hr />
+
+## 웹 브라우저 요청 흐름
+https://www.google.com:443/search?q=hello&hl=ko 로 요청을 하게 된다면,
+
+1. DNS 서버를 조회해서 IP 정보를 찾아낸다. (www.google.com -> IP: 200.200.200.2, PORT는 명시하지 않으면 https는 기본적으로 443)
+2. 웹 브라우저가 HTTP 요청 메시지를 생성한다.
+    ```
+    GET /search?q=hello?hl=ko HTTP/1.1
+    Host: www.google.com
+    ```
+    ㄴ HTTP 요청 메시지
+3. SOCKET 라이브러리를 통해 TCP/IP 계층으로 HTTP 요청 메시지를 전달한다.
+   - A: TCP/IP 연결(IP, PORT) -> syn, syn ack, ack
+   - B: 데이터 전달
+4. TCP/IP 패킷 생성, HTTP 메시지 포함
+    ```
+    출발지 IP, PORT
+    목적지 IP, PORT
+    ...
+    GET /search?q=hello?hl=ko HTTP/1.1
+    Host: www.google.com
+    ```
+    ㄴ 패킷 생성
+5. 이 패킷을 인터넷 망으로 던진다.
+6. 구글 서버는 요청 패킷을 받으면 TCP/IP 패킷을 까서 버린다.
+7. 그 다음 HTTP 메시지를 해석한다.
+8. 해석이 끝난 구글 서버는 HTTP 응답 메시지를 생성한다.
+    ```
+    HTTP/1.1 200 OK
+    Content-Type: text/html;charset=UTF-8
+    Content-Length: 3423
+
+    <html>
+      <body>...</body>
+    </html>
+    ```
+    ㄴ HTTP 응답 메시지
+9. 응답 메시지를 가지고 TCP/IP 패킷을 생성한다.
+10. 이 패킷을 인터넷 망으로 던진다.
+11. 웹 브라우저가 HTTP 응답 메세지를 해석한다.
+12. 웹 브라우저가 HTML을 렌더링 한다.
+
+<br />
+<hr />
